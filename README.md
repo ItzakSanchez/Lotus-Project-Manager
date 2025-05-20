@@ -1,2 +1,2 @@
-# Lotus-Task-Manager
-A task manager created with django
+# Lotus-Project-Manager
+A Project manager created with django
