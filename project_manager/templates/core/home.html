@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block title%}Home page{% endblock %}
+
+{% block content%}
+    <h1>Welcome to Lotus</h1>
+    <p>Lotus is a minimalistic project manager where you can easily manage and tracks your projects, get started by create an account and start your first project</p>
+    <a href="{% url 'core:about' %}">About</a>
+{% endblock %}

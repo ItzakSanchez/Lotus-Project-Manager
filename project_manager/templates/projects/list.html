@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title%}Your Projects{% endblock%}
+
+{% block content%}
+
+    {% if projects.length > 0%}
+        {% for project in projects%}
+            {{project.title}}
+            {{project.description}}
+        {% endfor %}
+    {% else %}
+        <p>No projects found. <a href="#">Create a new project</a></p>
+    {% endif %}
+
+
+{% endblock%}

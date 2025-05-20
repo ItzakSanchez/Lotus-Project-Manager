@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.eggs/
+dist/
+build/
+sdist/
+*.egg-info/
+*.deb
+*.rpm
+*linux*.whl
+*win*.whl
+*mac*.whl
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+*.log
+
+# PyInstaller
+*.manifest
+*.spec
+
+# IDEs and editors
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS generated files
+.DS_Store
