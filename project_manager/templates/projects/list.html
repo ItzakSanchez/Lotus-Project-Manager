@@ -3,14 +3,16 @@
 {% block title%}Your Projects{% endblock%}
 
 {% block content%}
-
-    {% if projects.length > 0%}
+    <h1>Your projects</h1>
+    {% if projects|length > 0 %}
+        <br>
         {% for project in projects%}
-            {{project.title}}
-            {{project.description}}
+            <a href="{% url 'projects:detail' project.pk%}">{{project.title}}</a>
+            <hr>
         {% endfor %}
+        <a href="{% url 'projects:create' %}"><input type="button" value="Create new project"></a>
     {% else %}
-        <p>No projects found. <a href="#">Create a new project</a></p>
+        <p>No projects found. <a href="{% url 'projects:create' %}">Create a new project</a></p>
     {% endif %}
 
 

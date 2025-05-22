@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title%}Edit - {{object.title}}{% endblock%}
+
+{% block content%}
+    <h1>Edit Tast '{{object.title}}'</h1>
+    <form method='post'>
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Edit Task</button>
+    </form>
+    <a href="{% url 'projects:detail' object.project.pk%}"><input type="button" value="Cancel"></a>
+{% endblock%}

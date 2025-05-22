@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title%}{{project.title}}{% endblock%}
+
+{% block content%}
+
+    <h1>{{project.title}}</h1>
+
+    <p>{{project.description}}</p>
+    <p>{{project.created_at}}</p>
+    <p>{{project.updated_at}}</p>
+    <p>{{project.user}}</p>
+
+    <a href="{% url 'projects:update' project.pk %}">Edit project</a>
+    <a href="{% url 'projects:list' %}">Return to your projects</a>
+    <a href="{% url 'projects:delete' project.pk %}">Delete</a>
+
+    <h2>List of tasks</h2>
+    {% if tasks|length > 0 %}
+        <table class="table">
+            <tr>
+                <th>Done</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+
+        {% for task in tasks%}
+            <tr>
+                <td><input type="checkbox" name="" id="" checked></td>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td><a href="{% url 'projects:update_task' task.pk %}">Edit</a></td>
+                <td><a href="{% url 'projects:delete_task' task.pk %}">Delete</a></td>
+            </tr>
+        {% endfor%}
+        </table>
+    {% else %}
+        <p>No tasks found</p>
+    {% endif %}
+<a href="{% url 'projects:create_task' project.pk%}"><input type="button" value="Create a task"></a>
+    
+{% endblock%}

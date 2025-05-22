@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title%}{{project.title}}{% endblock%}
+
+{% block content%}
+
+    <h1>{{task.title}}</h1>
+
+    <p>{{task.description}}</p>
+    <p>{{task.is_completed}}</p>
+
+    <a href="{% url 'projects:update_task' task.pk %}">Edit task</a>
+    <a href="{% url 'projects:detail' task.project.pk %}">Return to your project {{task.project.title}}</a>
+    <a href="{% url 'projects:delete_task' task.pk %}">Delete task</a>
+    
+{% endblock%}
