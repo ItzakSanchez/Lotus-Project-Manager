@@ -25,16 +25,20 @@
                 <th>Edit</th>
                 <th>Delete</th>
             </tr>
-
-        {% for task in tasks%}
-            <tr>
-                <td><input type="checkbox" name="" id="" checked></td>
-                <td>{{ task.title }}</td>
-                <td>{{ task.description }}</td>
-                <td><a href="{% url 'projects:update_task' task.pk %}">Edit</a></td>
-                <td><a href="{% url 'projects:delete_task' task.pk %}">Delete</a></td>
-            </tr>
-        {% endfor%}
+        <form method="post">
+            {% csrf_token %}
+            {% for task in tasks%}
+                <tr>
+                    <input type="hidden" name="{{task.pk}}" id="" {%if task.is_completed %}checked{% endif%}>
+                    <td><input type="checkbox" name="{{task.pk}}" id="" {%if task.is_completed %}checked{% endif%}></td>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.description }}</td>
+                    <td><a href="{% url 'projects:update_task' task.pk %}">Edit</a></td>
+                    <td><a href="{% url 'projects:delete_task' task.pk %}">Delete</a></td>
+                </tr>
+            {% endfor%}
+        <button type="submit">Update task status</button>
+        </form>
         </table>
     {% else %}
         <p>No tasks found</p>

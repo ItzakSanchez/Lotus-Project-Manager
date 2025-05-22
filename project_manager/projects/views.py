@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from django import forms
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, FormView
 
@@ -26,6 +27,19 @@ class ProjectDetailView(DetailView):
         context = super().get_context_data()
         context['tasks'] = get_list_or_404(Task, project=self.get_object())
         return context
+
+    def post(self, request, *args, **kwargs):
+        dict_values = request.POST
+        for k,v in dict_values.items():
+            if k.isdigit():
+                task = get_object_or_404(Task, pk=int(k))
+                if dict_values.get(k) == 'on':
+                    task.is_completed = True
+                else:
+                    task.is_completed = False
+                task.save()
+
+        return redirect(reverse_lazy('projects:detail', kwargs={'pk': self.kwargs.get('pk')}))
 
 class CreateForm(forms.ModelForm):
     class Meta:
@@ -99,3 +113,5 @@ class DeleteTaskView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy("projects:detail", kwargs={"pk": self.object.project.pk})
+
+
