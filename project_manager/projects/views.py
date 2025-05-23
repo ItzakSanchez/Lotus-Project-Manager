@@ -25,7 +25,9 @@ class ProjectDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['tasks'] = get_list_or_404(Task, project=self.get_object())
+        project = get_object_or_404(Project, id=self.kwargs['pk'])
+        tasks = project.tasks.all()
+        context['tasks'] = tasks
         return context
 
     def post(self, request, *args, **kwargs):

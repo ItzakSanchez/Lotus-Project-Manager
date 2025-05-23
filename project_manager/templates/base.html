@@ -8,6 +8,12 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+    {% if user.is_authenticated %}
+        <div>Login as: {{ user.get_username }}</div>
+        <div>
+            <form action="{% url 'users:logout' %}" method="post">{% csrf_token %}
+                <button type="submit">Logout</button></form></div>
+    {% endif %}
     {% block content %}
     {% endblock %}
 </body>
