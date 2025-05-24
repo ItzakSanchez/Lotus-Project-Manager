@@ -9,7 +9,7 @@ class Project(models.Model):
     description = models.TextField(null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # user = models.ForeignKey(get_user_model() , on_delete=models.CASCADE, related_name='projects')
+    user = models.ForeignKey(get_user_model() , on_delete=models.CASCADE, related_name='projects')
 
 class Task(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)

@@ -3,10 +3,11 @@
 {% block title%}Create new task{% endblock%}
 
 {% block content%}
-    <h1>Create new project</h1>
+    <h1>Create new Task</h1>
     <form method='post'>
         {% csrf_token %}
         {{ form }}
         <button type="submit">Create new task</button>
     </form>
+    <a href="{% url 'projects:detail' project %}"><input type="button" value="Return"></a>
 {% endblock%}

@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django import forms
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse_lazy
@@ -10,18 +12,32 @@ from projects.models import Project, Task
 
 
 # Create your views here.
-class ProjectListView(ListView):
+
+class ProjectListView(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('users:login')
     model = Project
     context_object_name = 'projects'
     template_name = 'projects/list.html'
 
-    # def get_queryset(self):
-    #     return Project.objects.filter(user=self.request.user)
+    def get_queryset(self):
+        try:
+            return Project.objects.filter(user=self.request.user)
+        except:
+            return None
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    login_url = reverse_lazy('users:login')
     model = Project
     template_name = 'projects/detail.html'
     context_object_name = 'project'
+
+
+    def test_func(self):
+        """
+        Test if the user is the owner of the project
+        """
+        project = get_object_or_404(Project,pk=self.kwargs['pk'])
+        return project.user == self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -48,13 +64,14 @@ class CreateForm(forms.ModelForm):
         model = Project
         fields = ['title', 'description']
 
-class CreateProjectView(FormView):
+class CreateProjectView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     model = Project
     form_class = CreateForm
     template_name = 'projects/create.html'
+    login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        #form.instance.user = self.request.user
+        form.instance.user = self.request.user
         obj = form.save()
         print(obj)
         return super().form_valid(form)
@@ -62,28 +79,58 @@ class CreateProjectView(FormView):
     def get_success_url(self):
         return reverse_lazy("projects:list")
 
-class UpdateProjectView(UpdateView):
+    def test_func(self):
+        """
+        Test if the user is the owner of the project
+        """
+        project = get_object_or_404(Project,pk=self.kwargs['pk'])
+        return project.user == self.request.user
+
+class UpdateProjectView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project
     fields = ['title', 'description']
     template_name = 'projects/update.html'
+    login_url = reverse_lazy('users:login')
 
     def get_success_url(self):
         return reverse_lazy("projects:detail", kwargs={"pk": self.object.id})
 
-class DeleteProjectView(DeleteView):
+    def test_func(self):
+        """
+        Test if the user is the owner of the project
+        """
+        project = get_object_or_404(Project,pk=self.kwargs['pk'])
+        return project.user == self.request.user
+
+class DeleteProjectView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Project
     template_name = 'projects/delete.html'
     success_url = reverse_lazy("projects:list")
+    login_url = reverse_lazy('users:login')
+
+
+    def test_func(self):
+        """
+        Test if the user is the owner of the project
+        """
+        project = get_object_or_404(Project,pk=self.kwargs['pk'])
+        return project.user == self.request.user
 
 
 # ==========================
 # ======= TASK CRUD ========
 # ==========================
 
-class CreateTaskView(CreateView):
+class CreateTaskView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Task
     template_name = 'projects/create_task.html'
     fields = ['title', 'description']
+    login_url = reverse_lazy('users:login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.kwargs['pk']
+        return context
 
     def form_valid(self, form):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
@@ -95,25 +142,46 @@ class CreateTaskView(CreateView):
         self.kwargs['pk'] = self.object.id
         return reverse_lazy("projects:detail", kwargs={"pk": self.object.project.pk})
 
-class DetailTaskView(DetailView):
+    def test_func(self):
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return project.user == self.request.user
+
+class DetailTaskView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Task
     template_name = 'projects/detail_task.html'
     context_object_name = 'task'
+    login_url = reverse_lazy('users:login')
 
+    def test_func(self):
+        task = get_object_or_404(Task, pk=self.kwargs['pk'])
+        project = task.project
+        return project.user == self.request.user
 
-class UpdateTaskView(UpdateView):
+class UpdateTaskView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Task
     fields = ['title', 'description']
     template_name = 'projects/update_task.html'
+    login_url = reverse_lazy('users:login')
 
     def get_success_url(self):
         return reverse_lazy("projects:detail", kwargs={"pk": self.object.project.pk})
 
-class DeleteTaskView(DeleteView):
+    def test_func(self):
+        task = get_object_or_404(Task, pk=self.kwargs['pk'])
+        project = task.project
+        return project.user == self.request.user
+
+class DeleteTaskView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Task
     template_name = 'projects/delete_task.html'
+    login_url = reverse_lazy('users:login')
 
     def get_success_url(self):
         return reverse_lazy("projects:detail", kwargs={"pk": self.object.project.pk})
+
+    def test_func(self):
+        task = get_object_or_404(Task, pk=self.kwargs['pk'])
+        project = task.project
+        return project.user == self.request.user
 
 
