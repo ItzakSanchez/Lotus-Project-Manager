@@ -13,8 +13,14 @@
         <div>
             <form action="{% url 'users:logout' %}" method="post">{% csrf_token %}
                 <button type="submit">Logout</button></form></div>
+    {% else %}
+        <div><a href="{% url 'users:login' %}">Login</a></div>
     {% endif %}
+
     {% block content %}
     {% endblock %}
 </body>
+
+
+
 </html>

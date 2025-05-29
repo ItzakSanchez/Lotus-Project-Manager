@@ -1,10 +1,6 @@
-from datetime import datetime
-
 from django import forms
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView, FormView
@@ -47,7 +43,6 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = 'projects/detail.html'
     context_object_name = 'project'
 
-
     def test_func(self):
         """
         Test if the user is the owner of the project
@@ -55,11 +50,32 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         project = get_object_or_404(Project,pk=self.kwargs['pk'])
         return project.user == self.request.user
 
+    def get_queryset(self):
+        try:
+            result = (Project.objects.filter(pk=self.kwargs['pk'])
+                      .annotate(total_tasks=Count('tasks'))
+                      .annotate(done_tasks=Count('tasks', filter=Q(tasks__is_completed = True))))
+            return result
+        except Exception as e:
+            print(e)
+            return None
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
+
+        #Add tasks related to this project
         project = get_object_or_404(Project, id=self.kwargs['pk'])
         tasks = project.tasks.all()
         context['tasks'] = tasks
+
+        #Add tasks details
+        project = context.get('project')
+        if project.total_tasks > 0:
+            project.progress = round(((project.done_tasks / project.total_tasks) * 100), 2)
+        else:
+            project.progress = 0
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -95,12 +111,6 @@ class CreateProjectView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         return reverse_lazy("projects:list")
 
-    # def test_func(self):
-    #     """
-    #     Test if the user is the owner of the project
-    #     """
-    #     project = get_object_or_404(Project,pk=self.kwargs['pk'])
-    #     return project.user == self.request.user
 
 class UpdateProjectView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project

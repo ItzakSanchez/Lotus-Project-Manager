@@ -10,13 +10,17 @@
     <p>{{project.created_at}}</p>
     <p>{{project.updated_at}}</p>
     <p>{{project.user}}</p>
+    <p>Progress:{{project.progress}}%</p>
 
     <a href="{% url 'projects:update' project.pk %}">Edit project</a>
     <a href="{% url 'projects:list' %}">Return to your projects</a>
     <a href="{% url 'projects:delete' project.pk %}">Delete</a>
 
-    <h2>List of tasks</h2>
+    <h2>List of tasks ({{project.total_tasks}})</h2>
+    <p>Total tasks: {{project.done_tasks}}</p>
+    <p>Completed tasks: {{project.total_tasks}}</p>
     {% if tasks|length > 0 %}
+        <p id="message" style="color:red"></p>
         <table class="table">
             <tr>
                 <th>Done</th>
@@ -30,13 +34,13 @@
             {% for task in tasks%}
                 <tr>
                     <input type="hidden" name="{{task.pk}}" id="" {%if task.is_completed %}checked{% endif%}>
-                    <td><input type="checkbox" name="{{task.pk}}" id="" {%if task.is_completed %}checked{% endif%}></td>
+                    <td><input type="checkbox" name="{{task.pk}}" id="" {%if task.is_completed %}checked{% endif%} onclick="showSaveWaring()"></td>
                     <td>{{ task.title }}</td>
                     <td>{{ task.description }}</td>
                     <td><a href="{% url 'projects:update_task' task.pk %}">Edit</a></td>
                     <td><a href="{% url 'projects:delete_task' task.pk %}">Delete</a></td>
                 </tr>
-            {% endfor%}
+            {% endfor %}
         <button type="submit">Update task status</button>
         </form>
         </table>
@@ -44,5 +48,11 @@
         <p>No tasks found</p>
     {% endif %}
 <a href="{% url 'projects:create_task' project.pk%}"><input type="button" value="Create a task"></a>
-    
+
+<script>
+    function showSaveWaring(event){
+        message = document.getElementById('message')
+        message.innerHTML = "Changes detected, don't forget to save changes."
+    }
+</script>
 {% endblock%}
