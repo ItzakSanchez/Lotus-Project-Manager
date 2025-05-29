@@ -5,12 +5,23 @@
 {% block content%}
     <h1>Your projects</h1>
     {% if projects|length > 0 %}
-        <br>
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Total Tasks</th>
+                <th>Done</th>
+                <th>Progress (%)</th>
+            </tr>
         {% for project in projects%}
-            <a href="{% url 'projects:detail' project.pk%}">{{project.title}}</a>
-            <hr>
+            <tr>
+                <td><a href="{% url 'projects:detail' project.pk%}">{{project.title}}</a></td>
+                <td>{{project.total_tasks}}</td>
+                <td>{{project.done_tasks}}</td>
+                <td>{{project.progress}}</td>
+            </tr>
         {% endfor %}
         <a href="{% url 'projects:create' %}"><input type="button" value="Create new project"></a>
+        </table>
     {% else %}
         <p>No projects found. <a href="{% url 'projects:create' %}">Create a new project</a></p>
     {% endif %}

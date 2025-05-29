@@ -3,6 +3,7 @@ from datetime import datetime
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse_lazy
@@ -21,9 +22,24 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         try:
-            return Project.objects.filter(user=self.request.user)
-        except:
+            query = (Project.objects.filter(user=self.request.user)
+                     .annotate(total_tasks=Count('tasks'))
+                     .annotate(done_tasks=Count('tasks', filter=Q(tasks__is_completed = True))))
+            return query
+        except Exception as e:
+            print(e)
             return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = context.get('projects')
+        for project in projects:
+            if project.total_tasks > 0:
+                project.progress = round((project.done_tasks / project.total_tasks) * 100, 2)
+            else:
+                project.progress = '0.0'
+
+        return context
 
 class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     login_url = reverse_lazy('users:login')
@@ -51,12 +67,12 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         for k,v in dict_values.items():
             if k.isdigit():
                 task = get_object_or_404(Task, pk=int(k))
-                if dict_values.get(k) == 'on':
-                    task.is_completed = True
-                else:
-                    task.is_completed = False
-                task.save()
-
+                if task.project.user == self.request.user: # Verify if the task is owned by the current user
+                    if dict_values.get(k) == 'on':
+                        task.is_completed = True
+                    else:
+                        task.is_completed = False
+                    task.save()
         return redirect(reverse_lazy('projects:detail', kwargs={'pk': self.kwargs.get('pk')}))
 
 class CreateForm(forms.ModelForm):
@@ -64,7 +80,7 @@ class CreateForm(forms.ModelForm):
         model = Project
         fields = ['title', 'description']
 
-class CreateProjectView(LoginRequiredMixin, UserPassesTestMixin, FormView):
+class CreateProjectView(LoginRequiredMixin, FormView):
     model = Project
     form_class = CreateForm
     template_name = 'projects/create.html'
@@ -79,12 +95,12 @@ class CreateProjectView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     def get_success_url(self):
         return reverse_lazy("projects:list")
 
-    def test_func(self):
-        """
-        Test if the user is the owner of the project
-        """
-        project = get_object_or_404(Project,pk=self.kwargs['pk'])
-        return project.user == self.request.user
+    # def test_func(self):
+    #     """
+    #     Test if the user is the owner of the project
+    #     """
+    #     project = get_object_or_404(Project,pk=self.kwargs['pk'])
+    #     return project.user == self.request.user
 
 class UpdateProjectView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project
