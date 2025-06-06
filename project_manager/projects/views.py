@@ -103,7 +103,7 @@ class CreateProjectView(LoginRequiredMixin, FormView):
     login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.user = self.request.user #Assigning the current user to the new Project
         obj = form.save()
         print(obj)
         return super().form_valid(form)
@@ -170,7 +170,7 @@ class CreateTaskView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def test_func(self):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        return project.user == self.request.user
+        return project.user == self.request.user # Test if the user is owner of the project which the task is assigned
 
 class DetailTaskView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Task

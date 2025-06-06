@@ -4,7 +4,51 @@
 {% block title%}Home page{% endblock %}
 
 {% block content%}
-    <h1>Welcome to Lotus</h1>
+    <h1 class="text-5xl my-5">Welcome to Lotus Project manager</h1>
     <p>Lotus is a minimalistic project manager where you can easily manage and tracks your projects, get started by create an account and start your first project</p>
-    <a href="{% url 'core:about' %}">About</a>
+
+    <p>
+        Your All-in-One Task Manager for a Smarter, Simpler Workflow
+        Tired of juggling sticky notes, endless email threads, and scattered to-do lists? Lotus brings everything together in one clean, powerful platform—so you can focus on what matters most.
+    </p>
+
+    <img src="{% static 'example.png'%}" alt="app screenshot">
+    <ul>
+        <li>✅ Stay Organized
+        Create, prioritize, and manage tasks with ease. Whether you're planning your day or managing a complex project, our intuitive interface helps you stay on track.
+        </li>
+
+        <li>
+            🤝 Collaborate Seamlessly
+        Work better together. Share projects, assign tasks, and communicate with your team in real-time—no more missed updates or messy handoffs.
+        </li>
+
+        <li>
+            📈 Track Your Progress
+        Visualize your productivity with smart dashboards and progress tracking. Celebrate milestones and keep your goals in sight.
+        </li>
+
+        <li>
+                    🔔 Never Miss a Beat
+        Get timely reminders, due date alerts, and smart suggestions to keep your workflow smooth and stress-free.
+        </li>
+
+        <li>
+            🌐 Work Anywhere
+        Access your tasks from any device, anytime. Whether you're at your desk or on the go, your productivity travels with you.
+        </li>
+    </ul>
+
+
+    <h2 class="text-4xl my-5">Why Choose Lotus?</h2>
+    <p>
+        Clean, distraction-free design
+        Built for individuals and teams
+        Fast, secure, and always in sync
+        Customizable to fit your workflow
+        🚀 Ready to Take Control of Your Day?
+        Start your free trial today and experience the future of task management.
+    </p>
+
+
 {% endblock %}
